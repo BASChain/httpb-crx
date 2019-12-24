@@ -10,7 +10,7 @@
   "scripts": {
 
     "test": "echo \"Error: no test specified\" && exit 1",
-    "deps-install":"npx yarn@1.21.0 && yarn@1.21.0 install"
+    "deps-install":"npx yarn@1.21.0 && npx yarn@1.21.0 install"
   },
   "repository": {
     "type": "git",
