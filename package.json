@@ -1,0 +1,35 @@
+{
+  "name": "httpb-crx",
+  "version": "0.0.1",
+  "description": "The BAS Extendsion for chromium",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "test"
+  },
+  "scripts": {
+
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deps-install":"npx yarn@1.21.0 && yarn@1.21.0 install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@flash:BASChain/httpb-crx.git"
+  },
+  "keywords": [
+    "Blockchain",
+    "DNS"
+  ],
+  "author": "basFronter",
+  "license": "MIT",
+  "devDependencies": {
+    "del": "^5.1.0",
+    "env-cmd": "^10.0.1",
+    "gulp": "^4.0.2",
+    "web-ext": "^3.2.1"
+  },
+  "engines":{
+    "node": ">=10.0.0",
+    "npm": ">=6.0.0"
+  }
+}
