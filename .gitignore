@@ -104,4 +104,4 @@ dist
 .tern-port
 
 # project
-.config/.env-cmdrc
+.config/.env*
