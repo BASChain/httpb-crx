@@ -2,6 +2,6 @@
 	TARGET:"chrome",
 	BUILD:"./build",
 	DEST:"./dist",
-	SRC:"src",
+	SRC:"./src",
 	APP:"./app"
 }
