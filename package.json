@@ -21,6 +21,10 @@
   ],
   "author": "basFronter",
   "license": "MIT",
+  "dependencies": {
+    "debug": "^4.1.1",
+    "webextension-polyfill": "^0.6.0"
+  },
   "devDependencies": {
     "del": "^5.1.0",
     "env-cmd": "^10.0.1",
@@ -30,8 +34,5 @@
   "engines": {
     "node": ">=10.0.0",
     "npm": ">=6.0.0"
-  },
-  "dependencies": {
-    "webextension-polyfill": "^0.6.0"
   }
 }
