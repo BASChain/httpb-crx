@@ -1,7 +1,7 @@
 {
-	TARGET:"chrome",
-	BUILD:"./build",
-	DEST:"./dist",
-	SRC:"./src",
-	APP:"./app"
+	"TARGET":"chrome",
+	"BUILD":"./build",
+	"DEST":"./dist",
+	"SRC":"./src",
+	"APP":"./app"
 }

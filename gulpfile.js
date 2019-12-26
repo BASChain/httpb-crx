@@ -3,6 +3,7 @@
 const pkgJson = require('./package.json'),
   projectJson = require('./.config/project.json'),
   assign = require('lodash.assign'),
+  browserify = require('browserify'),
   buffer = require('vinyl-buffer'),
   del = require('del'),
 
@@ -56,9 +57,9 @@ gulp.task('dev:extension',
   gulp.series(
     'clean',
     // 'dev:scss',
-    gulp.parallel(
-      'dev:copy'
-    )
+    // gulp.parallel(
+    //   'dev:copy'
+    // )
   )
 )
 
@@ -82,6 +83,14 @@ function createScssBuildTask({ src, dest, devMode, pattern }) {
 
 
 /* ======================== Build Js and deps  ============================= */
+const buildJsFiles = [
+  'background'
+]
+
+
+
+createTasksForBuildJsDeps({filename:'bg-libs',key:'background'})
+
 
 // bundle JS
 function createTasksForBuildJsDeps({key,filename}) {
@@ -98,7 +107,7 @@ function createTasksForBuildJsDeps({key,filename}) {
     label:filename,
     filename:`${filename}.js`,
     destinations,
-    dependenciesToBundle:externalDependenciesMap[key]
+    dependenciesToBundle:externalDepsMap[key]
   },bundleTaskOpts)))
 }
 
@@ -221,11 +230,32 @@ function generateBundler(opts,platformBundle) {
     })
 
   }
+
+  return bundler
+}
+
+/**
+ * @DateTime 2019-12-26
+ * @param    {array}   options.buildJsFiles [the modules name]
+ * @param    {string}   options.taskPrefix   task prefix
+ * @param    {boolean}   options.devMode
+ * @param    {boolean}   options.testing
+ * @param    {Object}   options.bundleOpts   the browserify
+ */
+function createTasksForBuildJsExtension ({
+  buildJsFiles,
+  taskPrefix,
+  devMode,
+  testing,
+  bundleOpts = {}
+}) {
+
 }
 
 
-function beep(){
+function beep() {
   process.stdout.write('\x07')
 }
+
 //Default
 gulp.task('default',gulp.series('dev:extension'))

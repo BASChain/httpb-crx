@@ -29,6 +29,7 @@
   "devDependencies": {
     "@babel/core": "^7.7.7",
     "babelify": "^10.0.0",
+    "brfs": "^2.0.2",
     "browserify": "^16.5.0",
     "del": "^5.1.0",
     "end-of-stream": "^1.4.4",
@@ -40,6 +41,7 @@
     "gulp-terser-js": "^5.0.1",
     "gulp-util": "^3.0.8",
     "lodash": "^4.17.15",
+    "vinyl-buffer": "^1.0.1",
     "vinyl-source-stream": "^2.0.0",
     "watchify": "^3.11.1",
     "web-ext": "^3.2.1"
