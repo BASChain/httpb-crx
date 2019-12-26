@@ -11,6 +11,7 @@ const pkgJson = require('./package.json'),
 	gulp = require('gulp'),
   gutil = require('gulp-util'),
   livereload = require('gulp-livereload'),
+
   pify = require('pify'),
   source = require('vinyl-source-stream'),
   sourcemaps = require('gulp-sourcemaps'),
@@ -23,9 +24,15 @@ const endOfStream = pify(require('end-of-stream'))
 const AppName = process.env.APP_NAME || pkgJson.name
 const Target = process.env.DEST_TARGET || "chromium"
 
+const materialUIDeps = ['@material-ui/core']
+
+
 const externalDepsMap = {
   background:[
     'web3'
+  ],
+  popup:[
+    ...materialUIDeps,
   ]
 }
 
@@ -89,7 +96,8 @@ const buildJsFiles = [
 
 
 
-createTasksForBuildJsDeps({filename:'bg-libs',key:'background'})
+//createTasksForBuildJsDeps({filename:'bg-libs',key:'background'})
+//createTasksForBuildJsExtension({ buildJsFiles, taskPrefix:'dev:extension:js',devMode:true})
 
 
 // bundle JS
@@ -180,6 +188,7 @@ function bundleTask (opts) {
   }
 }
 
+
 /**
  * @DateTime 2019-12-25
  * @param    {Object JSON}   opts      see function bundleTask
@@ -247,9 +256,54 @@ function createTasksForBuildJsExtension ({
   taskPrefix,
   devMode,
   testing,
-  bundleOpts = {}
+  bundleTaskOpts = {}
 }) {
+  const rootDir = `${gulpPaths.SRC}/scripts`
+  const destinations = browserPlatforms.map(platform => `${gulpPaths.DEST}/${platform}`)
+  const excludesInpageFiles = buildJsFiles.filter(file => file != 'inpage')
+  const buildPahse1 = []
+  const buildPahse2 = excludesInpageFiles
 
+  bundleTaskOpts = Object.assign({
+    buildSourceMaps:true,
+    sourceMapDir:'../sourcemaps',
+    minifyBuild:!devMode,
+    buildWithFullPaths:devMode,
+    watch:devMode,
+    devMode,
+    testing,
+  },bundleTaskOpts)
+
+  createTasksForBuildJs({ rootDir, taskPrefix, bundleTaskOpts, destinations, buildPahse1, buildPahse2 })
+}
+
+function createTasksForBuildJs ({
+  rootDir, taskPrefix, bundleTaskOpts, destinations,
+  buildPahse1 = [],
+  buildPahse2 = []
+}) {
+  const jsFiles = [].concat(buildPahse1, buildPahse2)
+
+  jsFiles.forEach((jsFile) => {
+    gulp.task(`${taskPrefix}:${jsFile}`,bundleTask(Object.assign({
+      label:jsFile,
+      filename:`${jsFile}.js`,
+      filepath:`${rootDir}/${jsFile}.js`,
+      externalDependencies:bundleTaskOpts.devMode ? undefined : externalDepsMap[jsFile],
+      destinations,
+    },bundleTaskOpts)))
+  })
+
+  //compose into larger task
+  const subtasks = []
+
+  subtasks.push(gulp.parallel(buildPahse1.map(file => `${taskPrefix}:${file}`)))
+
+  if(buildPahse2.length){
+    subtasks.push(gulp.parallel(buildPahse2.map(file => `${taskPrefix}:${file}`)))
+  }
+
+  gulp.task(taskPrefix,gulp.series(subtasks))
 }
 
 
