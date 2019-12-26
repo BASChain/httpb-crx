@@ -1,5 +1,9 @@
 'use strict'
 
-const punycode = require('punycode'),
-  base64Url = require('base64url'),
+const base64Url = require('base64url'),
   Web3 = require('web3')
+
+global.CommonUtils = {
+  Web3,
+  base64Url
+}

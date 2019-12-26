@@ -7,5 +7,6 @@ const punycode = require('punycode'),
 
 global.CommonUtils = {
   punycode,
-  base64Url
+  base64Url,
+  Web3
 }
