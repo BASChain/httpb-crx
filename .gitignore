@@ -107,3 +107,4 @@ dist
 
 # project
 .config/.env*
+app/bundles/*

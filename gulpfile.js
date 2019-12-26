@@ -56,22 +56,65 @@ gulp.task('clean',function clean(){
   return del([`${gulpPaths.BUILD}/*`])
 })
 
+//Gulp Task
+const copyTaskNames = []
+const copyDevTaskNames = []
 
-// gulp.task('dev:copy',
-//   gulp.series(
+createCopyTasks('locales',{
+  source:`${gulpPaths.APP}/_locales`,
+  destinations:commonPlatforms.map(platform => `${gulpPaths.BUILD}/${platform}/_locales`)
+})
 
-//   )
-// )
+createCopyTasks('icons',{
+  source:`${gulpPaths.APP}/icons`,
+  destinations:commonPlatforms.map(platform => `${gulpPaths.BUILD}/${platform}/icons`)
+})
 
-gulp.task('dev:extension',
-  gulp.series(
-    'clean',
-    // 'dev:scss',
-    // gulp.parallel(
-    //   'dev:copy'
-    // )
-  )
-)
+createCopyTasks('images',{
+  source:`${gulpPaths.APP}/images`,
+  destinations:commonPlatforms.map(platform => `${gulpPaths.BUILD}/${platform}/images`)
+})
+
+/* ====================== Copy Files ============================ */
+function createCopyTasks (label, opts) {
+  if(!opts.devOnly) {
+    const copyTaskName = `copy:${label}`
+    copyTask(copyTaskName,opts)
+    copyTaskNames.push(copyTaskName)
+  }
+  const copyDevTaskName = `dev:copy:${label}`
+  copyTask(copyDevTaskName,Object.assign({devMode:true},opts))
+  copyDevTaskNames.push(copyDevTaskName)
+}
+
+function copyTask(taskName,opts) {
+  const source = opts.source
+  const destination = opts.destination
+  const destinations = opts.destinations || [destination]
+  const pattern = opts.pattern || '**/*'
+  const devMode = opts.devMode
+
+  return gulp.task(taskName,() => {
+    if(devMode){
+      console.log('TODO copy watch')
+    }
+
+    return performCopy()
+
+
+  })
+
+  function performCopy() {
+    let stream = gulp.src(source + pattern,{base:source})
+
+    destinations.forEach(function(dest) {
+      stream = stream.pipe(gulp.dest(dest))
+    })
+
+    return stream
+  }
+
+}
 
 /* ====================== Build scss ============================ */
 
@@ -106,7 +149,7 @@ const buildJsFiles = [
 createTasks4BuildJSModules({
   taskPrefix:"dev:modules:bundle",
   jsModules: buildJsFiles,
-  devMode:false,
+  devMode:true,
   destinations:BundleJsDestinations,
 })
 
@@ -282,7 +325,7 @@ function createTasks4BuildJSModules ({
     subTasks.push(label)
   })
 
-  gulp.task(taskPrefix,gulp.series(subTasks))
+  gulp.task(taskPrefix,gulp.parallel(...subTasks))
 }
 
 function createTasks4Module (opts) {
@@ -312,7 +355,7 @@ function createTasks4Module (opts) {
       .pipe(source(opts.filename))
       .pipe(buffer())
 
-    console.log('buildSourceMaps',JSON.stringify(opts,null,2))
+    //console.log('buildSourceMaps',JSON.stringify(opts,null,2))
     if(opts.buildSourceMaps) {
       buildStream = buildStream
         .pipe(sourcemaps.init({loadMaps:true}))
@@ -380,6 +423,23 @@ function generateBrowserify(opts,performBundle) {
   return b
 }
 
+
+
+gulp.task('dev:copy',
+  gulp.series(gulp.parallel(...copyDevTaskNames))
+)
+
+gulp.task('dev:extension',
+  gulp.series(
+    'clean',
+//    'dev:modules:bundle',
+    // 'dev:scss',
+    gulp.parallel(
+      'dev:copy',
+      'dev:modules:bundle'
+    )
+  )
+)
 
 function beep() {
   process.stdout.write('\x07')
