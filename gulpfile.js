@@ -10,8 +10,9 @@ const pkgJson = require('./package.json'),
   envify = require('envify/custom'),
 	gulp = require('gulp'),
   gutil = require('gulp-util'),
+  jsoneditor = require('gulp-json-editor'),
   livereload = require('gulp-livereload'),
-
+  merge = require('gulp-merge-json'),
   pify = require('pify'),
   rename = require('gulp-rename'),
   source = require('vinyl-source-stream'),
@@ -26,6 +27,9 @@ const AppName = process.env.APP_NAME || pkgJson.name
 const Target = process.env.DEST_TARGET || "chromium"
 
 const materialUIDeps = ['@material-ui/core']
+const NODE_ENV = process.env.NODE_ENV || 'development';
+console.log('currentBuildMode',NODE_ENV)
+const DEV_MODE = process.env.DEV_MODE || true
 
 
 const externalDepsMap = {
@@ -66,14 +70,42 @@ createCopyTasks('locales',{
 })
 
 createCopyTasks('icons',{
-  source:`${gulpPaths.APP}/icons`,
+  source:`${gulpPaths.APP}/icons/`,
   destinations:commonPlatforms.map(platform => `${gulpPaths.BUILD}/${platform}/icons`)
 })
 
 createCopyTasks('images',{
-  source:`${gulpPaths.APP}/images`,
+  source:`${gulpPaths.APP}/images/`,
   destinations:commonPlatforms.map(platform => `${gulpPaths.BUILD}/${platform}/images`)
 })
+
+createCopyTasks('css',{
+  source:`${gulpPaths.APP}/css/`,
+  destinations:commonPlatforms.map(platform => `${gulpPaths.BUILD}/${platform}/css`)
+})
+
+createCopyTasks('vendor',{
+  source:`${gulpPaths.APP}/vendor/`,
+  destinations:commonPlatforms.map(platform => `${gulpPaths.BUILD}/${platform}/vendor`)
+})
+
+createCopyTasks('js',{
+  source:`${gulpPaths.APP}/js/`,
+  destinations:commonPlatforms.map(platform => `${gulpPaths.BUILD}/${platform}/js`)
+})
+
+
+createCopyTasks('html',{
+  source:`${gulpPaths.APP}/`,
+  pattern:'**/*.html',
+  devMode:true,
+  destinations:commonPlatforms.map(platform => `${gulpPaths.BUILD}/${platform}`)
+})
+
+
+//merge manifest json task
+createCopyMergeManifestTask(commonPlatforms)
+
 
 /* ====================== Copy Files ============================ */
 function createCopyTasks (label, opts) {
@@ -83,7 +115,7 @@ function createCopyTasks (label, opts) {
     copyTaskNames.push(copyTaskName)
   }
   const copyDevTaskName = `dev:copy:${label}`
-  copyTask(copyDevTaskName,Object.assign({devMode:true},opts))
+  copyTask(copyDevTaskName,Object.assign({devMode:isDevelopmentMode()},opts))
   copyDevTaskNames.push(copyDevTaskName)
 }
 
@@ -100,8 +132,6 @@ function copyTask(taskName,opts) {
     }
 
     return performCopy()
-
-
   })
 
   function performCopy() {
@@ -124,7 +154,6 @@ function createScssBuildTask({ src, dest, devMode, pattern }) {
       //TODO hotreload
 
     }
-
   }
 
   function buildScssWithSourceMaps () {
@@ -136,9 +165,10 @@ function createScssBuildTask({ src, dest, devMode, pattern }) {
 
 
 /* ======================== Build Js and deps  ============================= */
+
 const buildJsFiles = [
-  'background',
-  'popup'
+  'bglib',
+  'p3lib'
 ]
 
 
@@ -149,7 +179,7 @@ const buildJsFiles = [
 createTasks4BuildJSModules({
   taskPrefix:"dev:modules:bundle",
   jsModules: buildJsFiles,
-  devMode:true,
+  devMode:isDevelopmentMode(),
   destinations:BundleJsDestinations,
 })
 
@@ -300,16 +330,16 @@ function generateBundler(opts,platformBundle) {
 //build modules
 function createTasks4BuildJSModules ({
   taskPrefix, jsModules, devMode, destinations, bundleTaskOpts = {}
-}) {
+  }) {
   //console.log(typeof jsModules)
   const rootDir = gulpPaths.SRC
 
   bundleTaskOpts = Object.assign({
     devMode,
     sourceMapDir:'../sourcemaps',
-    watch:false,
-    buildSourceMaps:true,
-    minifyBuild:!devMode
+    watch:isDevelopmentMode(),
+    buildSourceMaps:!isDevelopmentMode(),
+    minifyBuild:!isDevelopmentMode()
   },bundleTaskOpts)
 
   let subTasks = []
@@ -329,7 +359,7 @@ function createTasks4BuildJSModules ({
 }
 
 function createTasks4Module (opts) {
-  let suffixName = opts.devMode ? '-bundle.js' : '.min.js'
+  let suffixName = getBundleSuffix(opts.devMode)
   let bundler
 
   return performBundle
@@ -351,6 +381,7 @@ function createTasks4Module (opts) {
       }
     })
 
+    console.log(opts.filename,'<-->',opts.filepath)
     buildStream = buildStream
       .pipe(source(opts.filename))
       .pipe(buffer())
@@ -424,7 +455,70 @@ function generateBrowserify(opts,performBundle) {
 }
 
 
+function createCopyMergeManifestTask(platforms) {
+  let targets = platforms || commonPlatforms
 
+  targets.map(target => {
+    let mergeTaskName = `copy:merge:${target}`
+    let opts = {
+      "devMode":isDevelopmentMode()
+    }
+    opts.src = `${gulpPaths.SRC}/${target}.manifest.json`
+    opts.dest = `${gulpPaths.BUILD}/${target}`
+    mergeManifestTask(mergeTaskName,opts);
+    copyTaskNames.push(mergeTaskName)
+
+    let devMergeTaskName = `dev:copy:merge:${target}`
+    mergeManifestTask(devMergeTaskName,opts);
+    copyDevTaskNames.push(devMergeTaskName)
+  })
+}
+
+function isDevelopmentMode(){
+  return NODE_ENV =='development'
+}
+
+function getBundleSuffix(devMode){
+  return devMode ? '-bundle.js' : '.min.js'
+}
+
+function mergeManifestTask(taskName,opts) {
+  const commonSrc = `${gulpPaths.SRC}/common.manifest.json`
+  let devMode = opts.devMode || false
+
+  return gulp.task(taskName,function(){
+    return gulp.src([
+      commonSrc,
+      opts.src
+    ]).pipe(merge())
+    .pipe(jsoneditor((json) =>{
+      json = handleChromeManifest(json,devMode)
+      return json
+    }))
+    .pipe(rename('manifest.json'))
+    .pipe(gulp.dest(opts.dest,{overwrite:true}))
+  })
+}
+
+function handleChromeManifest(json,devMode){
+  if(pkgJson.version)json.version = pkgJson.version
+  if(pkgJson.author)json.author = pkgJson.author
+
+  if(devMode){
+    json.permissions = [...json.permissions,'developerPrivate']
+  }
+  let suffixName = getBundleSuffix(devMode)
+
+  let bgBundles = buildJsFiles.filter(name => /^bg.*$/g.test(name)).map(filename => `bundles/${filename}${suffixName}`)
+  if(bgBundles.length && json.background){
+    json.background.scripts = json.background.scripts ? [...bgBundles,...json.background.scripts] : [...bgBundles]
+  }
+
+  return json
+}
+
+
+/*======================== Task Manager ===========================*/
 gulp.task('dev:copy',
   gulp.series(gulp.parallel(...copyDevTaskNames))
 )
@@ -432,7 +526,6 @@ gulp.task('dev:copy',
 gulp.task('dev:extension',
   gulp.series(
     'clean',
-//    'dev:modules:bundle',
     // 'dev:scss',
     gulp.parallel(
       'dev:copy',

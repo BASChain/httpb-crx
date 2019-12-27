@@ -1,3 +1,5 @@
+const json = require('../../src/common.manifest.json');
+console.log(JSON.stringify(json))
 const browserify = require('browserify'),
 path = require('path')
 

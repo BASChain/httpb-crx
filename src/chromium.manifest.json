@@ -1,0 +1,14 @@
+{
+  "minimum_chrome_version":"72",
+  "permissions": [
+    "webRequest",
+    "webRequestBlocking",
+    "webNavigation",
+    "storage",
+    "unlimitedStorage",
+    "tabs",
+    "notifications",
+    "<all_urls>",
+    "management"
+  ]
+}
