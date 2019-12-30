@@ -12,20 +12,20 @@
  */
 'use strict'
 const ABIS = require('./abi.js')
-const NWConfigs = {
-  "ropsten":{
-    "BAS_Token":"0x3058A7Ed6a0E15691F9e309cbe982A820928e055",
-    "BAS_Manager_Simple":"0x70BACAb31f1897dAFECa711475Fa81Fe49e5e04C"
-  },
-  "mainnet":{
-    "BAS_Token":"0x3058A7Ed6a0E15691F9e309cbe982A820928e055",
-    "BAS_Manager_Simple":"0x70BACAb31f1897dAFECa711475Fa81Fe49e5e04C"
-  }
-}
+const NWConfigs = require('./nwconfigs.js')
 
+const Infura = {
+  wssSchema:"wss",
+  httpSchema:"https",
+  projectId:"1362a998079949baaea80eb017fe1f0f",
+  defaccAddress:"0xFd30d2c32E6A22c2f026225f1cEeA72bFD9De865",
+  insec:"4fed2035cab14c39ae7602bc54e7f297"
+}
 const DEF_NETWORK = 'ropsten'
 class AbiManager {
-  constructor(network){
+  constructor(network,opts){
+    this.projectId = Infura.projectId
+
     this.gasPrice = "20000000000"
     if(typeof(network) ==='string' &&(network =='ropsten' || network =='mainnet')){
       this.network = network
@@ -33,7 +33,16 @@ class AbiManager {
       this.network = DEF_NETWORK
     }
 
-    _loadContractABI.apply(this,this.network)
+    if(typeof opts === 'object'){
+      this.options = opts;
+      this.secret = opts.secret || Infura.secret
+    }else if(typeof opts === 'string'){
+      this.secret = opts || Infura.secret
+    }else{
+      this.secret = Infura.insec ||'none'
+    }
+
+    _loadContractABI.call(this,this.network)
   }
 
   getContract(contractName){
@@ -46,11 +55,53 @@ class AbiManager {
   }
 
   getContractOptions(from){
+    let _form = from ||Infura.defaccAddress
     return {
-      from:from,
+      from:_form,
       gasPrice:this.gasPrice
     }
   }
+
+  getProvideUrl(type,secret){
+    switch(type){
+      case "http":
+        _providerHttpUrl.call(this)
+        break
+      case "httpSec":
+        _providerSecretHttpUrl.call(this,secret)
+        break
+      case "wss":
+        _providerWssUrl.call(this)
+        break
+      default:
+        _providerSecretHttpUrl.call(this,secret)
+        break
+    }
+
+    return this.providerUrl
+  }
+}
+
+function _providerSecretHttpUrl(secrct){
+  let _projectId = this.projectId ||Infura.projectId
+  let _secret = secrct || this.secret
+  let _network = this.network
+  this.providerUrl =  `${Infura.httpSchema}://:${_secret}@${_network}.infura.io/v3/${_projectId}`
+  return this.providerUrl
+}
+
+function _providerHttpUrl(){
+  let _projectId = this.projectId || Infura.projectId
+  let _network = this.network
+  this.providerUrl = `${Infura.httpSchema}://${_network}.infura.io/v3/${_projectId}`
+  return  this.providerUrl
+}
+
+function _providerWssUrl(){
+  _projectId = this.projectId || Infura.projectId
+  let _network = this.network
+   this.providerUrl = `${Infura.wssSchema}://${_network}.infura.io/ws/v3/${_projectId}`
+  return  this.providerUrl
 }
 
 function _loadContractABI(network){
@@ -60,20 +111,24 @@ function _loadContractABI(network){
     Contracts[key] = {
       "address":addresses[key]
     }
-    if(ABIS[key])Contracts[key][abi] = ABIS[key]
+    if(ABIS[key])Contracts[key]["abi"] = ABIS[key]
   })
 
   this.Contracts = Contracts;
 }
 
-const InfuraHandler = {
-  projectId:"1362a998079949baaea80eb017fe1f0f",
-
-}
-
-
-
+const promisity = (inner) =>
+  new Promise((resolve,reject) => {
+    inner((err,data) => {
+      if(!err){
+        resolve(data)
+      }else{
+        reject(err)
+      }
+    })
+  });
 
 module.exports = {
-  "AbiManager":AbiManager
+  "AbiManager":AbiManager,
+  promisity
 }

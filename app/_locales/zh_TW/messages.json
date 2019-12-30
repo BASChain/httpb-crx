@@ -1,0 +1,14 @@
+{
+  "appName": {
+    "message": "Basexer",
+    "description": "BAS Extension name"
+  },
+  "appShortName": {
+    "message": "BAS",
+    "description": "BAS"
+  },
+  "appDescription": {
+    "message": "Blockchain Addresss Alias Refferer",
+    "description": "Blockchain Addresss Alias Refferer"
+  }
+}

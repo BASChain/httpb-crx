@@ -8,7 +8,9 @@
     "test": "test"
   },
   "scripts": {
-    "gulp:build":"npx env-cmd -r ./.config/.env-cmdrc -e dev,comm gulp default",
+    "start":"run-s gulp:build run-chrome",
+    "run-chrome":"web-ext run -t chromium --browser-console",
+    "gulp:build": "npx env-cmd -r ./.config/.env-cmdrc -e dev,comm gulp default",
     "test": "npx DEV_MODE=ture env-cmd -r ./.config/.env-cmdrc -e comm node test/devtools/test.js",
     "deps-install": "npx yarn@1.21.0 && npx yarn@1.21.0 install"
   },
@@ -42,6 +44,7 @@
     "brfs": "^2.0.2",
     "browserify": "^16.5.0",
     "del": "^5.1.0",
+    "dotenv": "^8.2.0",
     "end-of-stream": "^1.4.4",
     "env-cmd": "^10.0.1",
     "envify": "^4.1.0",

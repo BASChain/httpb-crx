@@ -65,7 +65,8 @@ const copyTaskNames = []
 const copyDevTaskNames = []
 
 createCopyTasks('locales',{
-  source:`${gulpPaths.APP}/_locales`,
+  source:`${gulpPaths.APP}/_locales/`,
+  pattern:'**/*.json',
   destinations:commonPlatforms.map(platform => `${gulpPaths.BUILD}/${platform}/_locales`)
 })
 
@@ -125,7 +126,7 @@ function copyTask(taskName,opts) {
   const destinations = opts.destinations || [destination]
   const pattern = opts.pattern || '**/*'
   const devMode = opts.devMode
-
+  //console.log(source + pattern)
   return gulp.task(taskName,() => {
     if(devMode){
       console.log('TODO copy watch')
@@ -381,7 +382,7 @@ function createTasks4Module (opts) {
       }
     })
 
-    console.log(opts.filename,'<-->',opts.filepath)
+    //console.log(opts.filename,'<-->',opts.filepath)
     buildStream = buildStream
       .pipe(source(opts.filename))
       .pipe(buffer())
