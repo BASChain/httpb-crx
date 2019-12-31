@@ -8,7 +8,6 @@ const browser = require('webextension-polyfill'),
   { storeLosedOptions , optionDefaults } = require('./options.js')
 
 
-
 const { BasCompanion , BasUtils } = require('./bas-companion/index.js')
 
 
@@ -133,7 +132,4 @@ function navOnDOMContentLoadedFilter(){
   }
 }
 
-const inst = new DApp();
-_initWeb3.call(inst)
-
-global.BasDApp = inst;
+_initWeb3.call(new DApp())

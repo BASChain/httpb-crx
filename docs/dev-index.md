@@ -22,3 +22,5 @@ cd basexer-crx
 ```
 
 input key message 
+
+https://github.com/ipfs-shipyard/ipfs-companion/issues/164#issuecomment-328374052

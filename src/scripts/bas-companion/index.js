@@ -15,8 +15,8 @@ module.exports.BasUtils = {
 }
 
 
-module.exports.BasCompanion = async function init(BasDApp){
-  var BasDApp = BasDApp
+module.exports.BasCompanion = async function init(DAppInst){
+  var basDApp = DAppInst
 
   var bas //bas
   var state // local cache of various states
@@ -49,8 +49,11 @@ module.exports.BasCompanion = async function init(BasDApp){
     },
     get rumtime () {
       return runtime
-    }
+    },
 
+    get basDApp (){
+      return basDApp
+    }
   }
 
   return API
