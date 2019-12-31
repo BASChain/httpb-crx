@@ -43,11 +43,19 @@ class SearcherParser {
     return SearcherParser.ValidHttpbRegex.test(url)
   }
 
+  /**
+   * @DateTime 2019-12-31
+   * @param    {Object}   r  see _parseSearchURL
+   * @param    {string}   ip ip
+   * @return   {r}        fill redirectUrl
+   */
   handleRedirectUrl(r,ip){
     if(!r || !r.bas)return r;
-
-
+    let _url = _concatRedirectUrl(r.bas,ip)
+    r.redirectUrl = _url
+    return r;
   }
+
 }
 
 function _concatRedirectUrl(bas,ip){

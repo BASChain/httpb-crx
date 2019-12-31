@@ -11,7 +11,7 @@ log.enabled = true
 const punycode = require('punycode'),
   base64Url = require('base64url'),
   Web3 = require('web3'),
-  { AbiManager,promisity } = require('./bas-contract/index.js'),
+  { AbiManager, parseBas, promisity } = require('./bas-contract/index.js'),
   EngineParser = require('./engine-parser/index.js')
 
 global.promisity =promisity
@@ -25,6 +25,7 @@ global.CommonUtils = {
 
 class DApp {
   constructor(){
+    this.parseBasResult = parseBas
     let _abiManager = new AbiManager('ropsten')
     this.abiManager = _abiManager
     this.searcherParser = new EngineParser(false)
@@ -42,6 +43,11 @@ class DApp {
     return this[name]
   }
 
+  getState(){
+    if(this.web3 && this.basManager)
+      return 'completed.'
+    return false
+  }
 }
 
 async function _initWeb3() {

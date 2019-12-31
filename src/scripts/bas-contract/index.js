@@ -13,6 +13,7 @@
 'use strict'
 const ABIS = require('./abi.js')
 const NWConfigs = require('./nwconfigs.js')
+const { parseBas } = require('./basutils.js')
 
 const Infura = {
   wssSchema:"wss",
@@ -130,5 +131,6 @@ const promisity = (inner) =>
 
 module.exports = {
   "AbiManager":AbiManager,
+  parseBas,
   promisity
 }
