@@ -8,8 +8,8 @@
     "test": "test"
   },
   "scripts": {
-    "start":"run-s gulp:build run-chrome",
-    "run-chrome":"web-ext run -t chromium --browser-console",
+    "start": "run-s gulp:build run-chrome",
+    "run-chrome": "web-ext run -t chromium --browser-console",
     "gulp:build": "npx env-cmd -r ./.config/.env-cmdrc -e dev,comm gulp default",
     "test": "npx DEV_MODE=ture env-cmd -r ./.config/.env-cmdrc -e comm node test/devtools/test.js",
     "deps-install": "npx yarn@1.21.0 && npx yarn@1.21.0 install"
@@ -28,6 +28,7 @@
     "@material-ui/core": "^4.8.1",
     "base64url": "^3.0.1",
     "debug": "^4.1.1",
+    "lru-cache": "^5.1.1",
     "pify": "^4.0.1",
     "punycode": "^2.1.1",
     "react": "^16.12.0",

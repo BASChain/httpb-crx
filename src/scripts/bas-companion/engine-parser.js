@@ -1,24 +1,16 @@
 'use strict'
 
 //bas ,dns
-const DNS_MODE = "dns"
-const BAS_MODE = "bas"
+const DEF_MODE = "bas"
 
 
 class SearcherParser {
-  constructor(dnsMode) {
-    switch(dnsMode){
-      case 'bas':
-        this.mode = BAS_MODE
-        break
-      case 'dns':
-        this.mode = DNS_MODE
-        break
-      default:
-        this.mode = BAS_MODE
-        break
+  constructor(isDns) {
+    if(isDns){
+      this.mode = DEF_MODE
+    }else{
+      this.mode = "dns"
     }
-
     this.httpbRule = SearcherParser.HttpbRule
     this.supportEngines = SearcherParser.SupportEngines
   }
