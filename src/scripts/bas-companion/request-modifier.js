@@ -3,7 +3,8 @@ const debug = require('debug')
 const log = debug('basexter:request')
 log.error = debug('basexter:request:error')
 
-const LRU = require('lru-cache')
+const LRU = require('lru-cache'),
+  punycode = require('punycode')
 
 /**
  * [recoverableNetworkErrors description]
@@ -18,7 +19,8 @@ const recoverableNetworkErrors = new Set([
 
 const redirectOutHint = 'x-bas-no-redirect'
 
-function createRequestModifier (getState,runtime) {
+function createRequestModifier (getState,getParsingEngine,runtime) {
+
   const browser = runtime.browser
   const rtRoot = browser.runtime.getURL('/')
   const webExtOrigin = rtRoot ? new URL(rtRoot).origin : 'null'
@@ -29,6 +31,38 @@ function createRequestModifier (getState,runtime) {
 
   //origin details chrome
   const originUrls = new LRU(requestCacheCfg)
+
+
+
+
+  const redirectUrls = new LRU(requestCacheCfg)
+  const hasRedirectUrl = (id) => redirectUrls.get(id) !== undefined
+
+  const GetRedirectUrl = (id,parseData,dapp) => {
+    let _parseData = parseData;
+    if(redirectUrls.has(id)){
+      return {redirectUrl:redirectUrls.get(id)}
+    }
+    if(parseData && parseData.matched && parseData.alias && dapp){
+      let _pAlias = punycode.toASCII(parseData.alias);
+      console.log('alias',parseData.alias,'<<>>',_pAlias)
+      dapp.basManager.methods.queryByString(_pAlias).call((err,data)=>{
+        console.log("Data>>>>",parseData)
+        if(!err){
+          console.log(data)
+        }
+
+      })
+      let rurl = "http://104.238.165.23"
+      console.log('Set Cache>>>>>')
+      redirectUrls.set(id,rurl,1000*40)
+    }
+    return null;
+
+
+  }
+  /* -------------------------- */
+
 
   /**
    * @DateTime 2019-11-25
@@ -52,35 +86,96 @@ function createRequestModifier (getState,runtime) {
     }
   }
 
-  const lookupInBas = (request) => {
+  //处理跳过的url
+  const preNormalizationSkip = (request,parseData) =>{
+    if(!parseData || !parseData.matched){
+      ignore(request.requestId)
+    }else{
+      //todo cache need redirect alias→redirect
 
+    }
+
+    return isIgnored(request.requestId)
   }
 
+
+
+
   return {
-    onBeforeRequest (request) {
-      https://github.com/ipfs-shipyard/ipfs-companion/issues/164#issuecomment-328374052
+
+    /**
+     * @DateTime 2019-12-10
+     *
+     */
+    onBeforeRequest (request,dapp) {
+      //https://github.com/ipfs-shipyard/ipfs-companion/issues/164#issuecomment-328374052
       const state = getState()
-      logTest(request,'onBeforeRequest>>>>')
+      const parsingEngine = getParsingEngine()
+
+      logTest(request,'onBeforeSendHeaders>>>>')
+      const parseData = parsingEngine.parseUrl(request.url,request.requestId);
+      console.log('>>>',JSON.stringify(parseData))
+
+      if(preNormalizationSkip(request,parseData)){
+        console.log('skip normal')
+        return
+      }
+
+      return GetRedirectUrl(request.requestId,parseData,dapp)
+
     },
-    onBeforeSendHeaders (request) {
+    /**
+     * @DateTime 2019-12-15
+     *
+     */
+    onBeforeSendHeaders (request,dapp) {
       const state = getState()
       //if(!state.active) return
       logTest(request,'onBeforeSendHeaders>>>>')
     },
-    onHeadersReceived (request) {
+    /**
+     * @DateTime 2019-12-15
+     *
+     */
+    onHeadersReceived (request,dapp) {
       const state = getState()
+      logTest(request,'onHeadersReceived>>>>')
+      let rd = GetRedirectUrl(request.requestId)
+
+      console.log('onHeadersReceived>>>',rd)
+      if(rd)return rd;
+
+
       if(!state.active) return
+
+    },
+    onErrorOccurred (request,dapp) {
+      const state = getState()
+      if (!state.active) return
       logTest(request,'onHeadersReceived>>>>')
     },
-    onErrorOccurred (request) {
+    onComplated (request,dapp) {
       const state = getState()
+      logTest(request,'onComplated>>>>')
       if (!state.active) return
     },
-    onComplated (request) {
-      const state = getState()
-      if (!state.active) return
-      logTest(request,'onComplated>>>>')
+    cacheReset(name){
+      switch(name){
+        case 'ignore':
+          ignoreRequests.reset()
+          break
+        case 'originUrls':
+          originUrls.reset()
+          break
+        case 'all':
+          ignoreRequests.reset()
+          originUrls.reset()
+          break
+        default:
+          break
+      }
     }
+
   }
 }
 

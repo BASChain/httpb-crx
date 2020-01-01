@@ -83,7 +83,7 @@ async function _initWeb3() {
     let _OPTS = this.abiManager.getContractOptions(options.from) //from
     this.basManager = new _web3.eth.Contract(_MGR.abi,_MGR.address,_OPTS)
 
-    global.basCompanion = await BasCompanion(this)
+    global.basCompanion = await BasCompanion(this,options)
     // browser.webRequest.onBeforeRequest.addListener(onBeforeRequest,FilterArgs,['blocking'])
 
     // browser.webRequest.onHeadersReceived.addListener(onHeadersReceived, { urls: ['<all_urls>'] }, ['blocking', 'responseHeaders'])

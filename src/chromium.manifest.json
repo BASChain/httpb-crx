@@ -8,7 +8,8 @@
     "unlimitedStorage",
     "tabs",
     "notifications",
-    "<all_urls>",
+    "http://*/*",
+    "https://*/*",
     "management"
   ]
 }

@@ -31,7 +31,7 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 console.log('currentBuildMode',NODE_ENV)
 const DEV_MODE = process.env.DEV_MODE || true
 
-
+const livereloadPort = 36489
 const externalDepsMap = {
   background:[
     'web3'
@@ -58,6 +58,12 @@ const BundleJsDestinations = browserPlatforms.map(platform => `${gulpPaths.BUILD
 
 gulp.task('clean',function clean(){
   return del([`${gulpPaths.BUILD}/*`])
+})
+
+gulp.task('dev:reload',function(){
+  livereload.listen({
+    port:livereloadPort
+  })
 })
 
 //Gulp Task
@@ -128,9 +134,13 @@ function copyTask(taskName,opts) {
   const devMode = opts.devMode
   //console.log(source + pattern)
   return gulp.task(taskName,() => {
-    if(devMode){
-      console.log('TODO copy watch')
-    }
+    // if(devMode){
+    //   watch(source+pattern,(event) =>{
+    //     console.log(' copy watch',event.path)
+    //     livereload.changed(event.path)
+    //     performCopy()
+    //   })
+    // }
 
     return performCopy()
   })
@@ -452,6 +462,17 @@ function generateBrowserify(opts,performBundle) {
     global:true
   })
 
+/*  if(opts.watch){
+    b = watchify(b)
+
+    b.on('update',async (ids) =>{
+      console.log('ids',ids)
+      const stream = performBundle()
+      await endOfStream(stream)
+      livereload.changed(`${ids}`)
+    })
+  }*/
+
   return b
 }
 
@@ -529,8 +550,8 @@ gulp.task('dev:extension',
     'clean',
     // 'dev:scss',
     gulp.parallel(
-      'dev:copy',
-      'dev:modules:bundle'
+      'dev:modules:bundle',
+      'dev:copy'
     )
   )
 )
