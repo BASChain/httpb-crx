@@ -31,6 +31,8 @@ class ParsingEngine {
     this.httpbRule = ParsingEngine.HttpbRule
     this.engineRule = ParsingEngine.SearchRule
     this.dnsPloy = (dnsPloy >= 0 && dnsPloy < 3 ) ? dnsPloy : 0;
+    this.dohDomain = ParsingEngine.DoHDomain
+    this.dohPort = ParsingEngine.DoHPort
   }
 
   //return parseJson
@@ -78,6 +80,21 @@ class ParsingEngine {
   validHttpb(url){
     return ParsingEngine.ValidHttpbRegex.test(url)
   }
+
+  getQueryDns(alias) {
+    let url = `${ParsingEngine.HttpSchema}${this.dohDomain}:${this.dohPort}/dns-query?name=${alias}`
+    return url
+  }
+
+  parseDns(result) {
+    return _parseDNS.call(this,result)
+  }
+}
+
+function _parseDNS(result){
+  //Status 0 ,Answer Answer.type=1 (IP)
+  if(result.Status != 0 || !result.Answer) return null;
+  return result.Answer.filter(item => item.type == 1)
 }
 
 //ip :ip or domain(alias need punycode)
@@ -185,6 +202,8 @@ ParsingEngine.HttpbSchema = "httpb://"
 ParsingEngine.HttpSchema = "http://"
 ParsingEngine.SearchRule = /^(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/
 ParsingEngine.HttpbRule = /^(?:([A-Za-z]+):)?(\/{0,3})([^?#:/]*)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/
+ParsingEngine.DoHDomain = "dns.ppn.one"
+ParsingEngine.DoHPort = 8053
 
 ParsingEngine.SupportEngines = [
   {

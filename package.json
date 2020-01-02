@@ -1,6 +1,6 @@
 {
   "name": "httpb-crx",
-  "version": "0.0.1",
+  "version": "0.0.4",
   "description": "The BAS Extendsion for chromium",
   "main": "index.js",
   "directories": {
@@ -29,6 +29,7 @@
     "base64url": "^3.0.1",
     "debug": "^4.1.1",
     "is-fqdn": "^1.0.1",
+    "jquery": "^3.4.1",
     "lru-cache": "^5.1.1",
     "pify": "^4.0.1",
     "punycode": "^2.1.1",

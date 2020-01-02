@@ -1,13 +1,13 @@
 'use strict'
 
 const browser = require('webextension-polyfill'),
-  punycode = require('punycode'),
+
   base64Url = require('base64url'),
   Web3 = require('web3'),
   { AbiManager, parseBas, promisity } = require('./bas-contract/index.js'),
   { storeLosedOptions , optionDefaults } = require('./options.js')
 
-
+global.$ = global.jQuery = require('jquery');
 const { BasCompanion , BasUtils } = require('./bas-companion/index.js')
 
 
@@ -24,7 +24,6 @@ global.promisity = promisity
 global.BasUtils = BasUtils
 global.CommonUtils = {
   log,
-  punycode,
   base64Url,
   Web3,
   browser

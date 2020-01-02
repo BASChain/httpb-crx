@@ -10,6 +10,11 @@ const { createRequestModifier, redirectOutHint } = require('./request-modifier.j
 const ParsingEngine = require('./parsing-engine.js')
 const { initState } = require('./state.js')
 
+const punycode = require('punycode')
+const $ = require('jquery');
+global.$ = global.jQuery = $;
+
+
 module.exports.BasUtils = {
   ParsingEngine
 }
@@ -27,7 +32,7 @@ module.exports.BasCompanion = async function init(DAppInst,options){
 
   try{
     runtime = await createRuntimeInfo(browser)
-    console.log('createRuntimeInfo')
+    //console.log('createRuntimeInfo')
     requestModifier = createRequestModifier(getState,getParsingEngine,runtime)
 
     //registing Listeners
@@ -63,7 +68,7 @@ module.exports.BasCompanion = async function init(DAppInst,options){
     browser.webRequest.onBeforeRequest.addListener(
       onBeforeRequest,
       requestUrlTypesFilter,
-      ['blocking']
+      ['blocking',"extraHeaders", "requestBody"]
     )
 
     browser.webRequest.onBeforeSendHeaders.addListener(
@@ -84,6 +89,12 @@ module.exports.BasCompanion = async function init(DAppInst,options){
       requestUrlTypesFilter
     )
 
+/*    browser.webRequest.onCompleted.addListener(
+      onCompleted,
+      {urls: ['<all_urls>'] ,types:['main_frame']},
+      ['blocking','responseHeaders']
+    )*/
+
   }
 
   /* ============== HTTP Request ================== */
@@ -97,19 +108,59 @@ module.exports.BasCompanion = async function init(DAppInst,options){
    *   no onBeforeRedirect
    */
   function onBeforeRequest (request) {
-    return requestModifier.onBeforeRequest(request,basDApp)
+    const parEngine = getParsingEngine();
+
+    console.log(JSON.stringify(request))
+    const parseData = parEngine.parseUrl(request.url,request.requestId);
+    console.log(JSON.stringify(request))
+    if(!parseData || !parseData.alias)return
+
+    let _alias = punycode.toASCII(parseData.alias)
+    let queryDns = parEngine.getQueryDns(_alias)
+    console.log('queryDns>>>',queryDns)
+    let redirectObj = {}
+    $.ajax({
+      type:"GET",
+      url:queryDns,
+      dataType:"json",
+      async:false,
+      success:function (res){
+        console.log(res)
+        if(res.Status==0){
+          let dat = parEngine.parseDns(res);
+          if(dat && dat.length>0){
+            console.log('data',dat)
+            let reUrl = parEngine.buildRedirectUrl(parseData,dat[0].data)
+            redirectObj= {redirectUrl:reUrl}
+
+          }
+        }
+
+        //redirectObj= {redirectUrl:"http://www.baidu.com"}
+      },
+      error:function(e){
+        console.log(e.message)
+      }
+    })
+    return redirectObj;
+    //return requestModifier.onBeforeRequest(request,basDApp)
   }
 
+
   function onBeforeSendHeaders (request) {
-    return requestModifier.onBeforeSendHeaders(request,basDApp)
+    //return requestModifier.onBeforeSendHeaders(request,basDApp)
   }
 
   function onHeadersReceived (request) {
-    return requestModifier.onHeadersReceived(request,basDApp)
+    //return requestModifier.onHeadersReceived(request,basDApp)
   }
 
   function onErrorOccurred (request) {
-    return requestModifier.onErrorOccurred(request,basDApp)
+   // return requestModifier.onErrorOccurred(request,basDApp)
+  }
+
+  function onCompleted (request) {
+    console.log('onCompleted',JSON.stringify(request,null,2))
   }
 
   const API = {
