@@ -6,22 +6,33 @@ const pkgJson = require('./package.json'),
   browserify = require('browserify'),
   buffer = require('vinyl-buffer'),
   del = require('del'),
-
+  dotenv = require('dotenv'),
   envify = require('envify/custom'),
 	gulp = require('gulp'),
   gutil = require('gulp-util'),
   jsoneditor = require('gulp-json-editor'),
   livereload = require('gulp-livereload'),
   merge = require('gulp-merge-json'),
+  path = require('path'),
   pify = require('pify'),
   rename = require('gulp-rename'),
   source = require('vinyl-source-stream'),
   sourcemaps = require('gulp-sourcemaps'),
   terser = require('gulp-terser-js'),
-  watchify = require('watchify')
+  watchify = require('watchify'),
+  zip = require('gulp-zip')
 
 
 const endOfStream = pify(require('end-of-stream'))
+
+const envArgs = dotenv.config({
+  path:path.resolve(process.cwd(),'.config/.env'),
+  encoding:'utf8'
+})
+
+if(envArgs.error){
+  throw envArgs.error
+}
 
 const AppName = process.env.APP_NAME || pkgJson.name
 const Target = process.env.DEST_TARGET || "chromium"
@@ -555,6 +566,26 @@ gulp.task('dev:extension',
     )
   )
 )
+
+//zip
+gulp.task('zip:chrome',zipTask('chromium'))
+gulp.task('zip:firefox',zipTask('firefox'))
+
+gulp.task('zip:all',gulp.series(
+  'dev:extension','zip:chrome','zip:firefox'
+  )
+)
+
+function zipTask(target) {
+  return ()=>{
+    const zipSrc = `${gulpPaths.BUILD}/${target}/**`
+    const zipName = `${AppName}-${pkgJson.version}.zip`
+    const zipDest = `${gulpPaths.DEST}/${target}`
+    return gulp.src(zipSrc)
+      .pipe(zip(zipName))
+      .pipe(gulp.dest(zipDest,{overwrite:true}))
+  }
+}
 
 function beep() {
   process.stdout.write('\x07')

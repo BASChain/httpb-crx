@@ -152,7 +152,7 @@ function createRequestModifier (getState,getParsingEngine,runtime) {
       }
 
       let _alias = punycode.toASCII(parseData.alias)
-      let queryDns = parsingEngine.getQueryDns(_alias)
+
       //`http://dns.ppn.one:8053/dns-query?name=${_alias}`
       console.log('queryDns>>>',queryDns)
       let redirectObj = {}

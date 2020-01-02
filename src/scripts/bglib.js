@@ -7,7 +7,7 @@ const browser = require('webextension-polyfill'),
   { AbiManager, parseBas, promisity } = require('./bas-contract/index.js'),
   { storeLosedOptions , optionDefaults } = require('./options.js')
 
-global.$ = global.jQuery = require('jquery');
+
 const { BasCompanion , BasUtils } = require('./bas-companion/index.js')
 
 
