@@ -6,10 +6,8 @@
     "webNavigation",
     "storage",
     "unlimitedStorage",
-    "tabs",
     "notifications",
     "http://*/*",
-    "https://*/*",
-    "management"
+    "https://*/*"
   ]
 }
