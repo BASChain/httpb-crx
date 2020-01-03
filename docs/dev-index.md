@@ -1,5 +1,12 @@
 # Development Wiki
 
+> need global 
+
+> manager extension
+
+Chrome
+
+
 
 ## development evnironment prepared
 
@@ -20,6 +27,11 @@ cd basexer-crx
 ./bin/new-locale-key.sh 
 
 ```
+
+### package 
+
+> ISSUE
+crx_Required_Proof_missing
 
 input key message 
 

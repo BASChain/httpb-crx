@@ -579,7 +579,7 @@ gulp.task('zip:all',gulp.series(
 function zipTask(target) {
   return ()=>{
     const zipSrc = `${gulpPaths.BUILD}/${target}/**`
-    const zipName = `${AppName}-${pkgJson.version}.zip`
+    const zipName = `${AppName}-${pkgJson.version}-${target}.zip`
     const zipDest = `${gulpPaths.DEST}/${target}`
     return gulp.src(zipSrc)
       .pipe(zip(zipName))
