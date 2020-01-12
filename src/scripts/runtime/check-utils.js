@@ -61,5 +61,6 @@ async function createRuntimeInfo (browser) {
   })
 }
 
-module.exports.createRuntimeInfo = createRuntimeInfo
-module.exports.hasChromeSocketsForTCP = hasChromeSocketsForTCP
+module.exports = {
+  createRuntimeInfo,hasChromeSocketsForTCP
+}

@@ -18,7 +18,7 @@ class DohHandler {
   parseData(json) {
     if(!json || json.Status != 0)return false
 
-    let origin = QuestionName(json.Question.name)
+    let origin = QuestionName(json.Question[0].name.toString())
     if(!json.Answer) return false;
     let resultArr = json.Answer.filter(item => IsIPv4OrIPv6(item.data))
     if(resultArr.length==0)return false
