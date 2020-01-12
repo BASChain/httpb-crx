@@ -5,6 +5,7 @@ const pkgJson = require('./package.json'),
   assign = require('lodash.assign'),
   browserify = require('browserify'),
   buffer = require('vinyl-buffer'),
+  DateFormat = require('fast-date-format'),
   del = require('del'),
   dotenv = require('dotenv'),
   envify = require('envify/custom'),
@@ -24,6 +25,13 @@ const pkgJson = require('./package.json'),
 
 
 const endOfStream = pify(require('end-of-stream'))
+
+var dateFormat = new DateFormat('YYDDDD')
+const isPreRelease = true
+
+if(isPreRelease){
+  dateFormat = new DateFormat('MMDDDD-HHmm')
+}
 
 const envArgs = dotenv.config({
   path:path.resolve(process.cwd(),'.config/.env'),
@@ -55,7 +63,8 @@ const externalDepsMap = {
 const gulpPaths = Object.assign({
   APP:"./app",
   BUILD:"./build",
-  DEST:"./dist"
+  DEST:"./dist",
+  CONFIG:".config"
 },projectJson)
 
 const browserPlatforms = [
@@ -167,6 +176,39 @@ function copyTask(taskName,opts) {
   }
 
 }
+
+/* ======================= Edit Version =========================== */
+
+
+
+gulp.task('set:appinfo',function(){
+  const InfoFile = `${gulpPaths.CONFIG}/version-info.json`
+  const Target = `${gulpPaths.SRC}/scripts/runtime/`
+  console.log(Target)
+  return gulp.src(InfoFile)
+    .pipe(jsoneditor((json) =>{
+      //console.log(JSON.stringify(json,null,2))
+      return editAppInfo(json)
+    }))
+    .pipe(rename('info.json'))
+    .pipe(gulp.dest(Target,{overwrite:true}))
+})
+
+function editAppInfo(json) {
+  if(!json)json = {
+    name:"",
+    version:""
+  }
+
+  let _ver = process.env.APP_VER || pkgJson.version
+  let _tag = dateFormat.format(new Date())
+
+  json.version = _ver
+  json.author = pkgJson.author || process.env.APP_AUTHOR
+  json.buildTag = `${_ver}_${_tag}`
+  return json
+}
+
 
 /* ====================== Build scss ============================ */
 
@@ -558,6 +600,7 @@ gulp.task('dev:copy',
 
 gulp.task('dev:extension',
   gulp.series(
+    'set:appinfo',
     'clean',
     // 'dev:scss',
     gulp.parallel(

@@ -25,7 +25,6 @@
   "author": "basFronter",
   "license": "MIT",
   "dependencies": {
-    "@material-ui/core": "^4.8.1",
     "base64url": "^3.0.1",
     "debug": "^4.1.1",
     "is-fqdn": "^1.0.1",
@@ -51,6 +50,7 @@
     "end-of-stream": "^1.4.4",
     "env-cmd": "^10.0.1",
     "envify": "^4.1.0",
+    "fast-date-format": "^2.2.4",
     "gulp": "^4.0.2",
     "gulp-json-editor": "^2.5.4",
     "gulp-livereload": "^4.0.2",
