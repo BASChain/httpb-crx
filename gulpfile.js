@@ -145,13 +145,13 @@ function copyTask(taskName,opts) {
   const devMode = opts.devMode
   //console.log(source + pattern)
   return gulp.task(taskName,() => {
-    // if(devMode){
-    //   watch(source+pattern,(event) =>{
-    //     console.log(' copy watch',event.path)
-    //     livereload.changed(event.path)
-    //     performCopy()
-    //   })
-    // }
+    if(devMode){
+      watch(source+pattern,(event) =>{
+        console.log(' copy watch',event.path)
+        livereload.changed(event.path)
+        performCopy()
+      })
+    }
 
     return performCopy()
   })
