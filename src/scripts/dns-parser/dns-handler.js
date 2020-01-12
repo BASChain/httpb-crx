@@ -1,5 +1,4 @@
 'use strict'
-const
 
 const DEF_DOH_DOMAIN = 'http://dns.ppn.one:8053/dns-query?name=nbs'
 

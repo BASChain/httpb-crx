@@ -26,6 +26,11 @@ const pkgJson = require('./package.json'),
 
 
 const endOfStream = pify(require('end-of-stream'))
+const livereloadPort = 36489
+
+const liveOpts = {
+  port:livereloadPort
+}
 
 var dateFormat = new DateFormat('YYDDDD')
 const isPreRelease = true
@@ -51,7 +56,7 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 console.log('currentBuildMode',NODE_ENV)
 const DEV_MODE = process.env.DEV_MODE || true
 
-const livereloadPort = 36489
+
 const externalDepsMap = {
   background:[
     'web3'
@@ -516,7 +521,7 @@ function generateBrowserify(opts,performBundle) {
     global:true
   })
 
-/*  if(opts.watch){
+  if(opts.watch){
     b = watchify(b)
 
     b.on('update',async (ids) =>{
@@ -525,7 +530,7 @@ function generateBrowserify(opts,performBundle) {
       await endOfStream(stream)
       livereload.changed(`${ids}`)
     })
-  }*/
+  }
 
   return b
 }
@@ -595,6 +600,10 @@ function handleChromeManifest(json,devMode){
 
 
 /*======================== Task Manager ===========================*/
+gulp.task('watch',function(){
+  livereload.listen(liveOpts)
+})
+
 gulp.task('dev:copy',
   gulp.series(gulp.parallel(...copyDevTaskNames))
 )
@@ -607,7 +616,8 @@ gulp.task('dev:extension',
     gulp.parallel(
       'dev:modules:bundle',
       'dev:copy'
-    )
+    ),
+    'watch'
   )
 )
 
