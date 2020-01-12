@@ -20,6 +20,7 @@ const pkgJson = require('./package.json'),
   source = require('vinyl-source-stream'),
   sourcemaps = require('gulp-sourcemaps'),
   terser = require('gulp-terser-js'),
+  watch = require('gulp-watch'),
   watchify = require('watchify'),
   zip = require('gulp-zip')
 
