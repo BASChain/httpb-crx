@@ -8,6 +8,7 @@ global.AppUtils = {
 }
 
 
+
 function log(...msg){
   if(log.enabled){
     console.log(...msg)

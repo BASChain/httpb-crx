@@ -17,6 +17,7 @@ const pkgJson = require('./package.json'),
   path = require('path'),
   pify = require('pify'),
   rename = require('gulp-rename'),
+  shell = require('shelljs'),
   source = require('vinyl-source-stream'),
   sourcemaps = require('gulp-sourcemaps'),
   terser = require('gulp-terser-js'),
@@ -190,7 +191,7 @@ function copyTask(taskName,opts) {
 gulp.task('set:appinfo',function(){
   const InfoFile = `${gulpPaths.CONFIG}/version-info.json`
   const Target = `${gulpPaths.SRC}/scripts/runtime/`
-  console.log(Target)
+  //console.log(Target)
   return gulp.src(InfoFile)
     .pipe(jsoneditor((json) =>{
       //console.log(JSON.stringify(json,null,2))
@@ -253,149 +254,6 @@ createTasks4BuildJSModules({
   destinations:BundleJsDestinations,
 })
 
-
-// bundle JS
-function createTasksForBuildJsDeps({key,filename}) {
-  const destinations = browserPlatforms.map(platform => `${gulpPaths.DEST}/${platform}`)
-
-  const bundleTaskOpts = Object.assign({
-    buildSourceMaps:true,
-    sourceMapDir:'../sourcemaps',
-    minifyBuild:true,
-    devMode:false,
-  })
-
-  gulp.task(`build:extension:js:deps:${key}`,bundleTask(Object.assign({
-    label:filename,
-    filename:`${filename}.js`,
-    destinations,
-    dependenciesToBundle:externalDepsMap[key]
-  },bundleTaskOpts)))
-}
-
-/**
- * @DateTime 2019-12-25
- * @param    {Object JSON}   opts
- *                           buildSourceMaps(boolean),minifyBuild(boolean),destinations(array)
- *                           watch(boolean),devMode(boolean),buildWithFullPaths(array)
- */
-function bundleTask (opts) {
-  let bundler
-
-  return performBundle
-
-  function performBundle () {
-    if(!bundler) {
-      bundler = generateBundler(opts,performBundle)
-      bundler.on('log',gutil.log) // output build logs to terminal
-    }
-
-    let buildStream = bundler.bundle()
-
-    buildStream.on('error',(err) => {
-      beep()
-      if(opts.watch){
-        console.warn(err.stack)
-      }else{
-        throw err
-      }
-    })
-
-    //
-    buildStream = buildStream
-      .pipe(source(opts.filename))
-      .pipe(buffer())
-
-    if(opts.buildSourceMaps){
-      //loads map from browserify file
-      buildStream = buildStream
-        .pipe(sourcemaps.init({loadMaps:true}))
-    }
-
-    //minitication
-    if(opts.minifyBuild){
-      buildStream = buildStream
-        .pipe(terser({
-          mangle:{
-            reserved:['Bas','BASChain']
-          }
-        }))
-    }
-
-    //Finalize Source Maps
-    if(opts.buildSourceMaps) {
-      if(opts.devMode){
-        //https://bugs.chromium.org/p/chromium/issues/detail?id=931675
-        buildStream = buildStream.pipe(sourcemaps.write())
-      }else{
-        buildStream = buildStream
-          .pipe(sourcemaps.write(opts.sourceMapDir))
-      }
-    }
-
-    //ooutput completed bundles
-    opts.destinations.forEach((dest) =>{
-      buildStream = buildStream.pipe(gulp.dest(dest))
-    })
-
-    return buildStream
-  }
-}
-
-
-/**
- * @DateTime 2019-12-25
- * @param    {Object JSON}   opts      see function bundleTask
- * @param    {[type]}   platformBundle [description]
- * @return   {[type]}                  [description]
- */
-function generateBundler(opts,platformBundle) {
-  const browserifyOpts = assign({},watchify.args,{
-    plugin:[],
-    transform:[],
-    debug:opts.buildSourceMaps,
-    fullPaths:opts.buildWithFullPaths,
-  })
-
-  const bundleName = opts.filename.split('.')[0]
-
-  const activateAutoConfig = Boolean(process.env.SESIFY_AUTOGEN)
-
-  let bundler = browserify(browserifyOpts)
-    .transform('babelify')
-    // .transform('babelify',{
-    //   only:[
-    //     './**/node_modules'
-    //   ]
-    // })
-    .transform('brfs')
-
-  if(opts.buildLib) {
-    bundler = bundler.require(opts.dependenciesToBundle)
-  }
-
-  bundler.transform(envify({
-    NODE_ENV:opts.devMode ? 'development' : 'production',
-    INFURA_PROJECT_ID:process.env.INFURA_PROJECT_ID ||'',
-    INFURA_SECRET:process.env.INFURA_SECRET ||''
-  }),{
-    global:true
-  })
-
-  if(opts.watch){
-    bundler = watchify(bundler)
-
-    //on any file changed,re-runs the bundler
-    bundler.on('update',async (ids) => {
-      const stream = performBundle()
-      await endOfStream(stream)
-      livereload.changed(`${ids}`)
-    })
-
-  }
-
-  return bundler
-}
 
 //build modules
 function createTasks4BuildJSModules ({
@@ -600,8 +458,12 @@ function handleChromeManifest(json,devMode){
 
 
 /*======================== Task Manager ===========================*/
-gulp.task('watch',function(){
+gulp.task('watch',async function(){
   livereload.listen(liveOpts)
+})
+
+gulp.task('start-chrome',async function(){
+  shell.exec('npm run chrome')
 })
 
 gulp.task('dev:copy',
