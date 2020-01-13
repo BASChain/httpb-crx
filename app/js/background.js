@@ -1,5 +1,6 @@
 'use strict'
 
+
 // const DApp = {
 //   abiManager:new AbiManager('ropsten'),
 //   searcherParser:new EngineParser(false),
