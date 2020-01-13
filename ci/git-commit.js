@@ -33,7 +33,7 @@ function commit(){
 
   let stdout = sh.exec('git add .',{silent:true}).stdout;
   console.log(stdout);
-  stdout = sh.exec(`git commit -m "auto commit" -a`,{silent:true}).stdout;
+  stdout = sh.exec(`git commit -m "${pkgJson.version}:auto commit" -a`,{silent:true}).stdout;
   console.log(stdout);
   if(stdout.indexOf('nothing to commit') != -1){
     return;
