@@ -12,6 +12,7 @@
     "chrome": "web-ext run -t chromium --browser-console",
     "firefox": "web-ext run -t firefox --browser-console",
     "build-release": "cross-env NODE_ENV=production gulp:build",
+    "zip-chrome":"cross-env NODE_ENV=production node ci/7zip.js",
     "gulp:build": "npx env-cmd -r ./.config/.env-cmdrc -e dev,comm gulp default",
     "test": "npx DEV_MODE=ture env-cmd -r ./.config/.env-cmdrc -e comm node test/devtools/test.js",
     "deps-install": "npx yarn@1.21.0 && npx yarn@1.21.0 install"
@@ -45,6 +46,7 @@
     "@babel/plugin-transform-runtime": "^7.7.6",
     "@babel/preset-env": "^7.7.7",
     "babelify": "^10.0.0",
+    "bestzip": "^2.1.5",
     "brfs": "^2.0.2",
     "browserify": "^16.5.0",
     "del": "^5.1.0",
