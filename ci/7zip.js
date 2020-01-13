@@ -31,7 +31,7 @@ Dest7zip()
 
 function Dest7zip() {
   let srcDir = `${gulpPaths.BUILD}/${Target}`
-  let zipName = isDevelopmentMode() ? `pre-${AppName}-${AppVersion}.zip` : `${AppName}-${AppVersion}.zip`
+  let zipName = isDevelopmentMode() ? `pre-${AppName}-${AppVersion}.zip` : `${AppName}-${AppVersion}-${Target}.zip`
   let DEST_FILE = path.join(BASE_DIR,gulpPaths.DEST,Target,zipName)
   console.log(DEST_FILE)
   shell.cd(srcDir)

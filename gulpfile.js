@@ -479,6 +479,11 @@ gulp.task('dev:copy',
   gulp.series(gulp.parallel(...copyDevTaskNames))
 )
 
+//7zip
+gulp.task('7zip:chrome',function(){
+
+})
+
 //zip
 gulp.task('zip:chrome',zipTask('chromium'))
 gulp.task('zip:firefox',zipTask('firefox'))
@@ -487,6 +492,8 @@ gulp.task('zip:all',gulp.series(
   'zip:chrome','zip:firefox'
   )
 )
+
+
 
 gulp.task('dev:extension',
   gulp.series(
