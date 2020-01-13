@@ -8,9 +8,9 @@
     "test": "test"
   },
   "scripts": {
-    "start": "cross-env NODE_ENV=development gulp:build",
+    "start": "cross-env NODE_ENV=development gulp default",
     "chrome": "web-ext run -t chromium --browser-console",
-    "firefox": "web-ext run -t firefox --browser-console",
+    "firefox": "cross-env BUILD_TARGET=firefox web-ext run -f --verbose --browser-console",
     "build-release": "cross-env NODE_ENV=production gulp:build",
     "zip-chrome":"cross-env NODE_ENV=production node ci/7zip.js",
     "gulp:build": "npx env-cmd -r ./.config/.env-cmdrc -e dev,comm gulp default",

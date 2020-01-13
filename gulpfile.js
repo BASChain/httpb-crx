@@ -57,7 +57,7 @@ const Target = process.env.DEST_TARGET || "chromium"
 const materialUIDeps = ['@material-ui/core']
 
 const NODE_ENV = process.env.NODE_ENV || 'development';
-console.log('currentBuildMode',NODE_ENV,'---',process.env.NODE_ENV)
+console.log('currentBuildMode[',NODE_ENV,'],target[',Target,']')
 const DEV_MODE = isDevelopmentMode()
 
 /* ==================== Global Constants Defined End ======================  */
@@ -166,7 +166,7 @@ function copyTask(taskName,opts) {
   //console.log(source + pattern)
   return gulp.task(taskName,() => {
     if(devMode){
-      console.log('CopyTask>>',JSON.stringify(opts,null,2))
+     // console.log('CopyTask>>',JSON.stringify(opts,null,2))
       watch(source+pattern,(event) =>{
         console.log(' copy watch',event.path)
         livereload.changed(event.path)
@@ -449,7 +449,7 @@ function handleChromeManifest(json,devMode){
   if(pkgJson.version)json.version = pkgJson.version
   if(pkgJson.author)json.author = pkgJson.author
 
-  if(devMode){
+  if(devMode && isChromeTarget()){
     //,'developerPrivate'
     json.permissions = [...json.permissions,'developerPrivate']
   }
@@ -463,7 +463,9 @@ function handleChromeManifest(json,devMode){
   return json
 }
 
-
+function isChromeTarget(){
+  return Target == 'chromium'
+}
 /*======================== Task Manager ===========================*/
 gulp.task('watch',async function(){
   livereload.listen(liveOpts)
