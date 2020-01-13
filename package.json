@@ -1,6 +1,6 @@
 {
   "name": "httpb-crx",
-  "version": "0.0.4",
+  "version": "0.0.41",
   "description": "The BAS Extendsion for chromium",
   "main": "index.js",
   "directories": {

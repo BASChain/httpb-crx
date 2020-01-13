@@ -186,8 +186,6 @@ function copyTask(taskName,opts) {
 
 /* ======================= Edit Version =========================== */
 
-
-
 gulp.task('set:appinfo',function(){
   const InfoFile = `${gulpPaths.CONFIG}/version-info.json`
   const Target = `${gulpPaths.SRC}/scripts/runtime/`
