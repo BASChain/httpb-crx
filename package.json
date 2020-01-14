@@ -1,6 +1,6 @@
 {
   "name": "httpb-crx",
-  "version": "0.0.4",
+  "version": "0.0.41",
   "description": "The BAS Extendsion for chromium",
   "main": "index.js",
   "directories": {
@@ -8,8 +8,8 @@
     "test": "test"
   },
   "scripts": {
-    "start": "run-s gulp:build run-chrome",
-    "run-chrome": "web-ext run -t chromium --browser-console",
+    "start": "run-s gulp:build",
+    "chrome": "web-ext run -t chromium --browser-console",
     "gulp:build": "npx env-cmd -r ./.config/.env-cmdrc -e dev,comm gulp default",
     "test": "npx DEV_MODE=ture env-cmd -r ./.config/.env-cmdrc -e comm node test/devtools/test.js",
     "deps-install": "npx yarn@1.21.0 && npx yarn@1.21.0 install"
@@ -25,7 +25,6 @@
   "author": "basFronter",
   "license": "MIT",
   "dependencies": {
-    "@material-ui/core": "^4.8.1",
     "base64url": "^3.0.1",
     "debug": "^4.1.1",
     "is-fqdn": "^1.0.1",
@@ -51,6 +50,7 @@
     "end-of-stream": "^1.4.4",
     "env-cmd": "^10.0.1",
     "envify": "^4.1.0",
+    "fast-date-format": "^2.2.4",
     "gulp": "^4.0.2",
     "gulp-json-editor": "^2.5.4",
     "gulp-livereload": "^4.0.2",
@@ -59,9 +59,11 @@
     "gulp-sourcemaps": "^2.6.5",
     "gulp-terser-js": "^5.0.1",
     "gulp-util": "^3.0.8",
+    "gulp-watch": "^5.0.1",
     "gulp-zip": "^5.0.1",
     "lite-server": "^2.5.4",
     "lodash": "^4.17.15",
+    "shelljs": "^0.8.3",
     "vinyl-buffer": "^1.0.1",
     "vinyl-source-stream": "^2.0.0",
     "watchify": "^3.11.1",

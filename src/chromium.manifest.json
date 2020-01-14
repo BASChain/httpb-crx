@@ -3,11 +3,11 @@
   "permissions": [
     "webRequest",
     "webRequestBlocking",
-    "webNavigation",
     "storage",
     "unlimitedStorage",
     "notifications",
     "http://*/*",
-    "https://*/*"
+    "https://*/*",
+    "input"
   ]
 }
