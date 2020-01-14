@@ -109,3 +109,4 @@ dist
 .config/.env*
 app/bundles/*
 src/scripts/runtime/info.json
+*.pem
