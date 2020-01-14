@@ -56,6 +56,7 @@ async function init(opts){
       return
     }else{
       let respIPOrAlias = dohInst.parseData(respData)
+      if(!respIPOrAlias)return
       let redUrl = engineInst.buildRedirectUrl(searchData,respIPOrAlias)
       return {redirectUrl:redUrl}
     }
