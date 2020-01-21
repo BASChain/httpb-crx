@@ -5,6 +5,7 @@ const pkgJson = require('./package.json'),
   assign = require('lodash.assign'),
   browserify = require('browserify'),
   buffer = require('vinyl-buffer'),
+  chmod = require('gulp-chmod'),
   DateFormat = require('fast-date-format'),
   del = require('del'),
   dotenv = require('dotenv'),
@@ -26,6 +27,7 @@ const pkgJson = require('./package.json'),
   zip = require('gulp-zip')
 
 
+/* ==================== Global Constants Defined ======================  */
 const endOfStream = pify(require('end-of-stream'))
 const livereloadPort = 36489
 
@@ -53,11 +55,12 @@ const AppName = process.env.APP_NAME || pkgJson.name
 const Target = process.env.DEST_TARGET || "chromium"
 
 const materialUIDeps = ['@material-ui/core']
+
 const NODE_ENV = process.env.NODE_ENV || 'development';
-console.log('currentBuildMode',NODE_ENV)
-const DEV_MODE = process.env.DEV_MODE || true
+console.log('currentBuildMode[',NODE_ENV,'],target[',Target,']')
+const DEV_MODE = isDevelopmentMode()
 
-
+/* ==================== Global Constants Defined End ======================  */
 const externalDepsMap = {
   background:[
     'web3'
@@ -132,7 +135,7 @@ createCopyTasks('js',{
 createCopyTasks('html',{
   source:`${gulpPaths.APP}/`,
   pattern:'**/*.html',
-  devMode:true,
+  devMode:isDevelopmentMode(),
   destinations:commonPlatforms.map(platform => `${gulpPaths.BUILD}/${platform}`)
 })
 
@@ -143,6 +146,7 @@ createCopyMergeManifestTask(commonPlatforms)
 
 /* ====================== Copy Files ============================ */
 function createCopyTasks (label, opts) {
+
   if(!opts.devOnly) {
     const copyTaskName = `copy:${label}`
     copyTask(copyTaskName,opts)
@@ -162,6 +166,7 @@ function copyTask(taskName,opts) {
   //console.log(source + pattern)
   return gulp.task(taskName,() => {
     if(devMode){
+     // console.log('CopyTask>>',JSON.stringify(opts,null,2))
       watch(source+pattern,(event) =>{
         console.log(' copy watch',event.path)
         livereload.changed(event.path)
@@ -427,12 +432,15 @@ function mergeManifestTask(taskName,opts) {
     return gulp.src([
       commonSrc,
       opts.src
-    ]).pipe(merge())
+    ])
+    //.pipe(chmod(0o777))
+    .pipe(merge())
     .pipe(jsoneditor((json) =>{
       json = handleChromeManifest(json,devMode)
       return json
     }))
     .pipe(rename('manifest.json'))
+
     .pipe(gulp.dest(opts.dest,{overwrite:true}))
   })
 }
@@ -441,7 +449,8 @@ function handleChromeManifest(json,devMode){
   if(pkgJson.version)json.version = pkgJson.version
   if(pkgJson.author)json.author = pkgJson.author
 
-  if(devMode){
+  if(devMode && isChromeTarget()){
+    //,'developerPrivate'
     json.permissions = [...json.permissions,'developerPrivate']
   }
   let suffixName = getBundleSuffix(devMode)
@@ -454,7 +463,9 @@ function handleChromeManifest(json,devMode){
   return json
 }
 
-
+function isChromeTarget(){
+  return Target == 'chromium'
+}
 /*======================== Task Manager ===========================*/
 gulp.task('watch',async function(){
   livereload.listen(liveOpts)
@@ -467,6 +478,22 @@ gulp.task('start-chrome',async function(){
 gulp.task('dev:copy',
   gulp.series(gulp.parallel(...copyDevTaskNames))
 )
+
+//7zip
+gulp.task('7zip:chrome',function(){
+
+})
+
+//zip
+gulp.task('zip:chrome',zipTask('chromium'))
+gulp.task('zip:firefox',zipTask('firefox'))
+
+gulp.task('zip:all',gulp.series(
+  'zip:chrome','zip:firefox'
+  )
+)
+
+
 
 gulp.task('dev:extension',
   gulp.series(
@@ -481,12 +508,19 @@ gulp.task('dev:extension',
   )
 )
 
-//zip
-gulp.task('zip:chrome',zipTask('chromium'))
-gulp.task('zip:firefox',zipTask('firefox'))
-
-gulp.task('zip:all',gulp.series(
-  'dev:extension','zip:chrome','zip:firefox'
+gulp.task('prod:extension',
+  gulp.series(
+    'set:appinfo',
+    'clean',
+    // 'dev:scss',
+    gulp.parallel(
+      'dev:modules:bundle',
+      'dev:copy'
+    ),
+    gulp.parallel(
+      'zip:chrome',
+      'zip:firefox'
+    )
   )
 )
 
@@ -496,14 +530,39 @@ function zipTask(target) {
     const zipName = `${AppName}-${pkgJson.version}-${target}.zip`
     const zipDest = `${gulpPaths.DEST}/${target}`
     return gulp.src(zipSrc)
+      //.pipe(chmod(0o755))
       .pipe(zip(zipName))
       .pipe(gulp.dest(zipDest,{overwrite:true}))
+  }
+}
+
+const ChmodPermission = () =>{
+  return {
+    owner: {
+      read: true,
+      write: true,
+      execute: true
+    },
+    group: {
+      read: true,
+      execute: true
+    },
+    others: {
+      read: true,
+      execute: true
+    }
   }
 }
 
 function beep() {
   process.stdout.write('\x07')
 }
+var DEF_TASK = "dev:extension"
+if(isDevelopmentMode()){
+  DEF_TASK = "dev:extension"
+}else{
+  DEF_TASK = "prod:extension"
+}
 
 //Default
-gulp.task('default',gulp.series('dev:extension'))
+gulp.task('default',gulp.series(DEF_TASK))

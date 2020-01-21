@@ -9,9 +9,9 @@
   <script src="js/popup.js"></script>
 </head>
 <body ng-app="p3OptionsApp" ng-controller="p3Ctrl">
-  <h3>Basexer</h3>
+  <h3>{{ extName }}</h3>
   <div class="">
-    <span>Version: </span><span ng-show="mode">{{mode}}</span>
+    <span>Version: </span><span ng-show="mode">{{ extVersion }}</span>
   </div>
   <!-- <button ng-click="chanageMode()" class="disabled" >Changed</button> -->
 </body>
