@@ -1,7 +1,7 @@
 {
   "name": "httpb-crx",
-  "version": "0.0.5",
-  "description": "The BAS Extendsion for chromium",
+  "version": "0.1.0",
+  "description": "Domain Service Using Blockchain",
   "main": "index.js",
   "directories": {
     "doc": "docs",
