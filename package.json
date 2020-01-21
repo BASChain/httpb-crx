@@ -11,8 +11,9 @@
     "start": "cross-env NODE_ENV=development gulp default",
     "chrome": "web-ext run -t chromium --browser-console",
     "firefox": "cross-env BUILD_TARGET=firefox web-ext run -f --verbose --browser-console",
-    "build-release": "cross-env NODE_ENV=production gulp default",
-    "zip-chrome":"cross-env NODE_ENV=production node ci/7zip.js",
+    "publish-chrome":"cross-env NODE_ENV=production run-s build-release zip-chrome",
+    "build-release": "gulp default",
+    "zip-chrome":"node ci/7zip.js",
     "gulp:build": "npx env-cmd -r ./.config/.env-cmdrc -e dev,comm gulp default",
     "test": "npx DEV_MODE=ture env-cmd -r ./.config/.env-cmdrc -e comm node test/devtools/test.js",
     "deps-install": "npx yarn@1.21.0 && npx yarn@1.21.0 install"

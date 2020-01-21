@@ -7,7 +7,6 @@
     "unlimitedStorage",
     "notifications",
     "http://*/*",
-    "https://*/*",
-    "input"
+    "https://*/*"
   ]
 }
