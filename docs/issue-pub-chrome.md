@@ -12,3 +12,11 @@ npm run publish-chrome
 
 
 ```
+
+## publish log 
+> BAS publish log 
+
+|  version  |  Date  |  comments  |
+|  --  |  --  |  --  |
+| v0.1.1 | 2020-04-04  |  update protocol by alias |
+|  -- |  --  | -- |

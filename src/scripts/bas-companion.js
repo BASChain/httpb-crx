@@ -49,6 +49,7 @@ async function init(opts){
     let _alias = punycode.toASCII(searchData.alias)
 
     let queryURL = dohInst.getQueryUrl(_alias)
+    console.log('DNS url>',queryURL)
 
     let respData = QueryDns(queryURL)
 

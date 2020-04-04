@@ -21,8 +21,18 @@ class DohHandler {
     if(!json || json.Status != 0)return false
 
     let origin = QuestionName(json.Question[0].name.toString())
+    let answer = json.Answer
+
     if(!json.Answer) return false;
 
+    //alias name
+    if(isAliasName(json.Answer)){
+      return answer[0].data
+    }
+
+    /**
+     * Tradition Domain
+     */
     let tradResults = json.Answer.filter(item => IsTraditionDomain(item))
     if(tradResults.length > 0){
       return origin
@@ -39,13 +49,27 @@ const QuestionName = (name) => {
   return name.endsWith('.') ? name.substring(0,name.length-1) : name
 }
 
+function isAliasName(answer){
+  if(!answer||!answer.length){
+    return false
+  }
+
+  return answer.find(item => item.type == 10 && item.data === 'AliasName') ? true : false;
+}
+
+/**
+ * 10 ,
+ * @DateTime 2020-04-03
+ * @param    {[type]}   item [description]
+ * @return   {[type]}        [description]
+ */
 const IsTraditionDomain = (item) => {
   return item && item.type == TRA_TYPE && item.data == TRA_DATA
 }
 
 function _initDohHandler(opts){
   this.QSchema = 'http'
-  this.QDomain = 'dns.ppn.one'
+  this.QDomain = 'extdns.ppn.one'
   this.QPort = 8053
   this.QPreUri = `${this.QSchema}://${this.QDomain}:${this.QPort}/dns-query?name=`
   this.isMatch = (ip) =>{return IPv46Regex.test(ip)}
