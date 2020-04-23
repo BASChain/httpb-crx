@@ -1,6 +1,6 @@
 {
   "name": "httpb-crx",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "description": "Domain Service Using Blockchain",
   "main": "index.js",
   "directories": {
