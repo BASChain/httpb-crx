@@ -4,35 +4,35 @@ const BAS_MODE = "BAS"
 const DNS_MODE = "DNS"
 
 const AppSettings = {
-  "ExtName":"Basexer",
-  "Version":"0.0.4"
+  "ExtName":"BAS",
+  "Version":"1.0.0"
 }
 upAppInfo();
 
 
 angular.module('p3OptionsApp',[]).controller('p3Ctrl',['$scope',function($s){
   var storage = chrome.storage.local;
-  storage.set({"enable_bas":false})
+
   $s.mode = BAS_MODE
   $s.extVersion = AppSettings.Version
   $s.extName = AppSettings.ExtName
+  $s.networks = CommonUtils.networks
+  //$s.chainId = basexer.Storage.get('chainId')
 
-  storage.get({"enable_bas":false},function(obj){
-    //console.log('mode',JSON.stringify(obj,null,2))
-    $s.mode = 'v0.0.4'
+  storage.get({chainId:''},function(obj){
+    console.log('get from storage',obj)
+    $s.chainId = obj.chainId
     $s.$apply()
   })
 
-
-
-/*  $s.chanageMode = function(){
-    storage.get({"enable_bas":false},function(obj) {
-      storage.set({"enable_bas" : !obj["enable_bas"] })
-      $s.mode = (!obj["enable_bas"]) ? BAS_MODE : DNS_MODE
-      //console.log('>>>',$s.mode)
-      $s.$apply();
+  $s.networkChange = function(){
+    const networkId = $s.chainId
+    console.log('Current chainId:',networkId);
+    storage.set({chainId:networkId},function(){
+      console.log('Update local storage chainId',networkId)
     })
-  }*/
+  }
+
 }]);
 
 function upAppInfo(){

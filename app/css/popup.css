@@ -1,9 +1,132 @@
-body {
-  width:180px;
-  text-align: center;
-  font-family: Arial,sans-serif;
+html,body{
+  font-family: Roboto, Arial;
+  color: #4d4d4d;
+  font-weight: 400;
+  background: #f7f7f7;
+  width: 357px;
+  margin: 0;
+  padding: 0;
+  font-size: 16px;
+  overflow-x:hidden;
 }
 
-h1,h2,h3 {
-  font-size: 1rem
+.bas-header {
+  position: relative;
+  width: 100%;
+  height: 44px;
+  display: inline-flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f2f3f4;
+}
+
+.bas-header > div:first-child{
+  margin-left: 8px;
+}
+
+.bas-header > div:nth-last-child(1){
+  margin-right: 8px;
+}
+
+.networks-wrapper {
+  width: 260px;
+  display: inline-flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.networks-select {
+  line-height: 24px;
+  cursor: pointer;
+  border-radius: 20px;
+  border:2px solid #bbc0c5;
+  padding-right: 4px;
+}
+
+.networks-select select {
+  min-width: 140px;
+  padding-right: 2rem;
+  color: #4d4d4d;
+  font-size: 1rem;
+  text-transform: capitalize;
+  border: none;
+  outline: none;
+  /*去掉默认的下拉三角*/
+  appearance:none;
+  -moz-appearance:none;
+  -webkit-appearance:none;
+  /*添加下拉三角图标*/
+  background: url("../icons/img/select-icon.png") no-repeat right center transparent;
+
+}
+
+.networks-select select>option {
+  text-transform: capitalize;
+}
+
+span.dot-state> div{
+  width: 16px;
+  height: 16px;
+  border-radius: 16px;
+  margin:auto 6px;
+  background: rgba(233, 21, 80, 0.7);
+}
+
+span.dot-state> div.ropsten {
+  background: rgba(233, 21, 80, 0.7);
+  border: 1px solid rgba(233, 21, 80, 0.9);
+}
+
+.dot-state> div.mainnet {
+  background: rgba(3, 135, 137, 0.7);
+  border: 1px solid rgba(3, 135, 137, 0.9);
+}
+
+.bas-footer {
+  position: relative;
+  width: 100%;
+  height: 32px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  background: #f2f3f4;
+}
+
+.bas-body {
+  position: relative;
+  width: clac(100% - 24px);
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  background: #fff;
+  padding: 12px;
+}
+
+.bas-body .inner-body {
+  position: relative;
+  width: 100%;
+  display: inline-block;
+  direction: column;
+  justify-content: space-around;
+  align-items: center;
+}
+
+h1,h3 {
+  margin-top:4px;
+  font-size:22px;
+  font-weight: bold;
+  letter-spacing: 1.5px;
+}
+
+h6 {
+  margin: 0 auto;
+}
+
+
+/* Firefox only */
+@supports (-moz-appearance:none) {
+  label input {
+    position: relative;
+    top:1px;
+  }
 }

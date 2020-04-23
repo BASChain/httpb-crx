@@ -35,3 +35,12 @@
 //     })
 //   }
 // }
+//
+chrome.runtime.onInstalled.addListener(function(){
+  var StorageArea = chrome.storage.local;
+
+  StorageArea.set({"chainId":3},function(){
+    console.log('init on Ropsten:',3)
+  })
+
+})

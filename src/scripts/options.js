@@ -4,7 +4,7 @@ module.exports.optionDefaults = Object.freeze({
   dnsMode:'bas',
   netchain:'ropsten',
   from:'0xFd30d2c32E6A22c2f026225f1cEeA72bFD9De865',
-  basDomain:'dns.bas.com'
+  basDomain:'rdns.baschain.org'
 })
 
 /**

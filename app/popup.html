@@ -9,10 +9,35 @@
   <script src="js/popup.js"></script>
 </head>
 <body ng-app="p3OptionsApp" ng-controller="p3Ctrl">
-  <h3>{{ extName }}</h3>
-  <div class="">
-    <span>Version: </span><span ng-show="mode">{{ extVersion }}</span>
+  <div class="bas-header">
+    <div>
+      <img src="icons/png/bas-active-19.png">
+    </div>
+    <div class="networks-wrapper">
+      <div class="networks-select">
+        <select ng-init="chainId == networks[1].chainId" ng-model="chainId"
+          ng-change="networkChange();"
+          ng-options="o.chainId as o.name for o in networks">
+        </select>
+      </div>
+      <span class="dot-state">
+        <div ng-class="{1:'mainnet',3:'ropsten'}[chainId]">
+        </div>
+      </span>
+    </div>
   </div>
-  <!-- <button ng-click="chanageMode()" class="disabled" >Changed</button> -->
+  <div class="bas-body">
+    <div class="inner-body">
+      <h3 style="text-align: center;">{{extName}}</h3>
+      <p class="ext-description">
+    We provide “httpb” scheme url ( like httpb://❤) to notice Bas that this url need to be interpreted to ip address according blockchain data storage. Then we can access the website by ip. You can visit http://baschain.org/ to require free BAS and ETH on Ropsten test network, then you can spend BAS to register your own domain on blockchain!
+      </p>
+    </div>
+  </div>
+  <div class="bas-footer">
+    <h6 class="text-center">
+      <span>Version: </span><span id="extVersion">{{extVersion}}</span>
+    </h6>
+  </div>
 </body>
 </html>

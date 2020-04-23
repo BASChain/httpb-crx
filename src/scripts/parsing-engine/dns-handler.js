@@ -3,6 +3,7 @@
 const DEF_DOH_DOMAIN = 'http://dns.ppn.one:8053/dns-query?name=nbs'
 const TRA_TYPE = 10
 const TRA_DATA = "TraditionSystemName"
+const {getNetwork} = require('../abi-manager/networks.js')
 
 const IsIPv4OrIPv6 = (ip) => {
   return /^((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$|^([\da-fA-F]{1,4}:){6}((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$|^::([\da-fA-F]{1,4}:){0,4}((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$|^([\da-fA-F]{1,4}:):([\da-fA-F]{1,4}:){0,3}((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$|^([\da-fA-F]{1,4}:){2}:([\da-fA-F]{1,4}:){0,2}((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$|^([\da-fA-F]{1,4}:){3}:([\da-fA-F]{1,4}:){0,1}((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$|^([\da-fA-F]{1,4}:){4}:((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$|^([\da-fA-F]{1,4}:){7}[\da-fA-F]{1,4}$|^:((:[\da-fA-F]{1,4}){1,6}|:)$|^[\da-fA-F]{1,4}:((:[\da-fA-F]{1,4}){1,5}|:)$|^([\da-fA-F]{1,4}:){2}((:[\da-fA-F]{1,4}){1,4}|:)$|^([\da-fA-F]{1,4}:){3}((:[\da-fA-F]{1,4}){1,3}|:)$|^([\da-fA-F]{1,4}:){4}((:[\da-fA-F]{1,4}){1,2}|:)$|^([\da-fA-F]{1,4}:){5}:([\da-fA-F]{1,4})?$|^([\da-fA-F]{1,4}:){6}:$/.test(ip)
@@ -14,7 +15,16 @@ class DohHandler {
 
   getQueryUrl (alias){
     //punycode transfer
-    return this.QPreUri + alias
+    const dnsQuery = `${this.QSchema}://${this.QDomain}:${this.QPort}/dns-query?name=`
+
+    return dnsQuery + alias
+  }
+
+  setQDomain(chainId){
+    if(!chainId)chainId = 3
+    const nw = getNetwork(chainId)
+    this.QDomain = nw.dns;
+    console.log('new QueryDns:',`${this.QSchema}://${this.QDomain}:${this.QPort}/dns-query?name=`)
   }
 
   parseData(json) {

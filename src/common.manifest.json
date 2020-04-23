@@ -21,7 +21,7 @@
       "19": "icons/png/bas-active-19.png",
       "38": "icons/png/bas-active-38.png"
     },
-    "default_title": "Basexer",
+    "default_title": "BAS",
     "default_popup": "popup.html"
   },
   "default_locale": "en"

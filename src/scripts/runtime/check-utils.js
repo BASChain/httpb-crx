@@ -61,6 +61,15 @@ async function createRuntimeInfo (browser) {
   })
 }
 
+function BindThisProperties(obj) {
+  if(typeof obj !== 'object' || !Object.keys(obj))return
+
+  let that = this
+  Object.keys(obj).forEach( (key) => {
+    if(typeof obj[key] !== 'undefined')that[key] = obj[key]
+  })
+}
+
 module.exports = {
-  createRuntimeInfo,hasChromeSocketsForTCP
+  createRuntimeInfo,hasChromeSocketsForTCP,BindThisProperties
 }

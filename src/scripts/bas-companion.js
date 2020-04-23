@@ -9,6 +9,20 @@ const punycode = require('punycode')
 async function init(opts){
   const engineHandlerInst = new EngineHandler()
   const dohHandlerInst = new DohHandler()
+
+
+
+  chrome.storage.onChanged.addListener(function(changes,area){
+    let changedItems = Object.keys(changes)
+    console.log('changed area',area)
+    for(let item of changedItems) {
+      console.log('changed Key',item)
+      if(item ==='chainId'){
+        let chainId = changes[item].newValue;
+        dohHandlerInst.setQDomain(chainId)
+      }
+    }
+  })
   var runtime
 
   try{
@@ -65,6 +79,17 @@ async function init(opts){
   }
 
   /* ===================  ================== */
+  async function getChainId(){
+    var StorageArea = chrome.storage.local;
+    return new Promise((resolve,reject) =>{
+      if(!StorageArea)return reject('No storage')
+
+      StorageArea.get({chainId:''},function(obj){
+        return resolve(obj.chainId)
+      })
+    })
+  }
+
   function QueryDns(queryURL){
     let result = ''
     $.ajax({

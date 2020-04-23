@@ -1,0 +1,31 @@
+module.exports = {
+  get:(key) => {
+    try{
+      return JSON.parse(localStorage.getItem(key));
+    }catch(e){
+      return undefined
+    }
+  },
+
+  set:(key,val)=> {
+    try{
+      localStorage.setItem(key,JSON.stringify(val))
+    }catch(e){
+    }
+  },
+
+  remove :(key)=> {
+    try{
+      localStorage.removeItem(key)
+    }catch(e){
+    }
+  },
+
+  clear:()=>{
+    try{
+      localStorage.clear()
+    }catch(e){
+
+    }
+  },
+}
