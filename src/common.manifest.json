@@ -4,7 +4,7 @@
   "name": "__MSG_appName__",
   "short_name": "__MSG_appShortName__",
   "description": "__MSG_appDescription__",
-  "author": "nbstim",
+  "author": "bastim",
   "icons": {
     "16": "icons/png/bas-active-16.png",
     "32": "icons/png/bas-active-32.png",
